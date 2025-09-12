@@ -14,6 +14,7 @@ const ProductSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+//test commit to git
 
 //module.exports = mongoose.model("Product", ProductSchema);
 
