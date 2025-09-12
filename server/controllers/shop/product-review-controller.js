@@ -1,7 +1,7 @@
 //13:10
 
 const Order = require("../../models/order");
-const Product = require("../../models/Product");
+const Product = require("../../models/product");
 const ProductReview = require("../../models/Review");
 
 const addProductReview = async (req, res) => {
