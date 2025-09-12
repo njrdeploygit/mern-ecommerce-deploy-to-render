@@ -1,6 +1,6 @@
 
 //13:44
-const Product = require("../../models/product");
+const Product = require("../../models/Product");
 
 const searchProducts = async (req, res) => {
   try {
