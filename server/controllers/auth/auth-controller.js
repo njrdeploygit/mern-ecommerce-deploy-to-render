@@ -20,7 +20,7 @@ const registerUser = async (req, res) => {
       email,
       password: hashPassword,
     });
-    
+
     //create new user inthe database
     await newUser.save();
     res.status(200).json({
@@ -69,9 +69,20 @@ const loginUser = async (req, res) => {
       { expiresIn: "60m" }
     );
 
-    res.cookie("token", token, { httpOnly: true, secure: true }).json({
+    // res.cookie("token", token, { httpOnly: true, secure: true }).json({
+    //   success: true,
+    //   message: "Logged in successfully",
+    //   user: {
+    //     email: checkUser.email,
+    //     role: checkUser.role,
+    //     id: checkUser._id,
+    //     userName: checkUser.userName,
+    //   },
+    // });
+    res.status(200).json({
       success: true,
-      message: "Logged in successfully",
+      message: "Logged in successfull",
+      token,
       user: {
         email: checkUser.email,
         role: checkUser.role,
@@ -98,10 +109,36 @@ const logoutUser = (req, res) => {
 };
 
 //auth middleware
+// const authMiddleware = async (req, res, next) => {
+//   const token = req.cookies.token; //get the token
+//   if (!token)
+//     //if th token not exist
+//     return res.status(401).json({
+//       //token is not present then user cannot access
+//       success: false,
+//       message: "Unauthorised user!",
+//     });
+
+//   try {
+//     //decrypt the present token in order to use it
+//     const decoded = jwt.verify(token, "CLIENT_SECRET_KEY");
+//     req.user = decoded;
+//     next();
+//   } catch (error) {
+//     res.status(401).json({
+//       success: false,
+//       message: "Unauthorised user!",
+//     });
+//   }
+// };
+
 const authMiddleware = async (req, res, next) => {
-  const token = req.cookies.token;    //get the token 
-  if (!token)                         //if th token not exist
-    return res.status(401).json({     //token is not present then user cannot access
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token)
+    //if th token not exist
+    return res.status(401).json({
+      //token is not present then user cannot access
       success: false,
       message: "Unauthorised user!",
     });
