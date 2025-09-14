@@ -2,7 +2,11 @@ import {
   BadgeCheck,
   ChartNoAxesCombined,
   LayoutDashboard,
+  Ribbon,
+  RibbonIcon,
   ShoppingBasket,
+  SquareStackIcon,
+  UsersRoundIcon,
 } from "lucide-react";
 import { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +18,24 @@ const adminSidebarMenuItems = [
     label: "Dashboard",
     path: "/admin/dashboard",
     icon: <LayoutDashboard />,
+  },
+  {
+    id: "users",
+    label: "Users",
+    path: "/admin/users",
+    icon: <UsersRoundIcon />,
+  },
+  {
+    id: "categories",
+    label: "Categories",
+    path: "/admin/categories",
+    icon: <SquareStackIcon />,
+  },
+  {
+    id: "brands",
+    label: "Brands",
+    path: "/admin/brands",
+    icon: <RibbonIcon />,
   },
   {
     id: "products",
