@@ -9,6 +9,7 @@ import {
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
+import { ComboboxDemo } from "../combobox";
 
 function CommonForm({
   formControls,
@@ -23,6 +24,10 @@ function CommonForm({
     const value = formData[getControlItem.name] || "";
 
     switch (getControlItem.componentType) {
+      case "combobox":
+        element = <ComboboxDemo />;
+
+        break;
       case "input":
         element = (
           <Input
@@ -58,9 +63,7 @@ function CommonForm({
             <SelectContent>
               {getControlItem.options && getControlItem.options.length > 0
                 ? getControlItem.options.map((optionItem) => (
-                    <SelectItem key={optionItem.id} value={optionItem.id}>
-                      {optionItem.label}
-                    </SelectItem>
+                    <SelectItem key={optionItem.id} value={optionItem.id}>{optionItem.label}</SelectItem>
                   ))
                 : null}
             </SelectContent>
@@ -112,13 +115,20 @@ function CommonForm({
     <form onSubmit={onSubmit}>
       <div className="flex flex-col gap-3">
         {formControls.map((controlItem) => (
-          <div className="grid w-full gap-1.5" key={controlItem.name}>
+          <div
+            className="grid w-full gap-1.5"
+            key={controlItem.name}
+          >
             <Label className="mb-1">{controlItem.label}</Label>
             {renderInputsByComponentType(controlItem)}
           </div>
         ))}
       </div>
-      <Button disabled={isBtnDisabled} type="submit" className="mt-2 w-full">
+      <Button
+        disabled={isBtnDisabled}
+        type="submit"
+        className="mt-2 w-full"
+      >
         {buttonText || "Submit"}
       </Button>
     </form>

@@ -2,7 +2,6 @@ import {
   BadgeCheck,
   ChartNoAxesCombined,
   LayoutDashboard,
-  Ribbon,
   RibbonIcon,
   ShoppingBasket,
   SquareStackIcon,
@@ -49,6 +48,12 @@ const adminSidebarMenuItems = [
     path: "/admin/orders",
     icon: <BadgeCheck />,
   },
+  // {
+  //   id: "testarea",
+  //   label: "Test Area",
+  //   path: "/admin/testarea",
+  //   icon: <BadgeCheck />,
+  // },
 ];
 
 function MenuItems({ setOpen }) {

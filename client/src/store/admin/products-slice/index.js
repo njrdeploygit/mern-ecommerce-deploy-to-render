@@ -6,8 +6,9 @@ const initialState = {
   productList: [],
 };
 
-//api call url : http://localhost:5000/ +
-//base url     : api/admin/products +
+//These endpoints return data objects
+//api call url : http://localhost:5000/
+//base url     : api/admin/products
 //endpoint     : /add
 
 export const addNewProduct = createAsyncThunk(
@@ -33,7 +34,9 @@ export const fetchAllProducts = createAsyncThunk(
     const result = await axios.get(
       `${import.meta.env.VITE_API_URL}/api/admin/products/get`
     );
-
+    
+    console.log(result?.data,"admin fetchAllProducts");
+    
     return result?.data;
   }
 );
@@ -82,7 +85,7 @@ const AdminProductsSlice = createSlice({
       })
       .addCase(fetchAllProducts.rejected, (state, action) => {
         state.isLoading = false;
-        state.productList = [];      //make empty if case rejected is true
+        state.productList = []; //make empty if case rejected is true
       });
   },
 });

@@ -4,7 +4,7 @@ import AdminHeader from "./header";
 import { useState } from "react";
 
 function AdminLayout() {
-  const [openSidebar, setOpenSidebar] = useState(false);
+  const [openSidebar, setOpenSidebar] = useState(false);     //property get ,set
 
   return (
     <div className="flex min-h-screen w-full">

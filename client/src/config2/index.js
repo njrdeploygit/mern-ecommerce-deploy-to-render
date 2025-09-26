@@ -39,7 +39,7 @@ export const loginFormControls = [
   },
 ];
 
-export const addProductFormElements = (categories = [], brands = []) => [
+export const addProductFormElements = [
   {
     label: "Title",
     name: "title",
@@ -57,50 +57,28 @@ export const addProductFormElements = (categories = [], brands = []) => [
     label: "Category",
     name: "category",
     componentType: "select",
-    options: categories
-      .map((cat) => ({
-        id: cat._id,
-        label: cat.title,
-      }))
-      .sort((a, b) => a.label.localeCompare(b.label)), // ASC sort
+    options: [
+      { id: "men", label: "Men" },
+      { id: "women", label: "Women" },
+      { id: "kids", label: "Kids" },
+      { id: "accessories", label: "Accessories" },
+      { id: "footwear", label: "Footwear" },
+    ],
   },
-  //  {
-  //   label: "Category",
-  //   name: "category",
-  //   componentType: "select",
-  //   options: [
-  //     { id: "men", label: "Men" },
-  //     { id: "women", label: "Women" },
-  //     { id: "kids", label: "Kids" },
-  //     { id: "accessories", label: "Accessories" },
-  //     { id: "footwear", label: "Footwear" },
-  //   ],
-  // },
   {
     label: "Brand",
     name: "brand",
     componentType: "select",
-    options: brands
-      .map((cat) => ({
-        id: cat._id,
-        label: cat.title,
-      }))
-      .sort((a, b) => a.label.localeCompare(b.label)), // ASC sort
+    options: [
+      { id: "nike", label: "Nike" },
+      { id: "adidas", label: "Adidas" },
+      { id: "puma", label: "Puma" },
+      { id: "levi", label: "Levi's" },
+      { id: "zara", label: "Zara" },
+      { id: "h&m", label: "H&M" },
+      { id: "denim&m", label: "Denim" },
+    ],
   },
-  // {
-  //   label: "Brand",
-  //   name: "brand",
-  //   componentType: "select",
-  //   options: [
-  //     { id: "nike", label: "Nike" },
-  //     { id: "adidas", label: "Adidas" },
-  //     { id: "puma", label: "Puma" },
-  //     { id: "levi", label: "Levi's" },
-  //     { id: "zara", label: "Zara" },
-  //     { id: "h&m", label: "H&M" },
-  //     { id: "denim&m", label: "Denim" },
-  //   ],
-  // },
   {
     label: "Price",
     name: "price",
@@ -184,27 +162,6 @@ export const brandOptionsMap = {
   "h&m": "H&M",
 };
 
-export const filterOptions2 = (categories = [], brands = []) => [
-  {
-    label: "Category",
-    name: "category",
-
-    options: categories.map((cat) => ({
-      id: cat._id,
-      label: cat.title,
-    })).sort((a, b) => a.label.localeCompare(b.label)), // ASC sort
-  },
-  {
-    label: "Brand",
-    name: "brand",
-
-    options: brands.map((cat) => ({
-      id: cat._id,
-      label: cat.title,
-    })).sort((a, b) => a.label.localeCompare(b.label)), // ASC sort
-  },
-];
-
 export const filterOptions = {
   category: [
     { id: "men", label: "Men" },
@@ -269,22 +226,6 @@ export const addressFormControls = [
 ];
 
 export const categoryFormControls = [
-  {
-    label: "Title",
-    name: "title",
-    componentType: "input",
-    type: "text",
-    placeholder: "Enter category title",
-  },
-  {
-    label: "Description",
-    name: "description",
-    componentType: "input",
-    type: "text",
-    placeholder: "Enter category description",
-  },
-];
-export const brandFormControls = [
   {
     label: "Title",
     name: "title",

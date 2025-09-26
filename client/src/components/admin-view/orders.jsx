@@ -52,7 +52,7 @@ function AdminOrdersView() {
               <TableHead>Order Status</TableHead>
               <TableHead>Order Price</TableHead>
               <TableHead>
-                <span className="sr-only">Details</span>
+                <span className="sr-only">Actions</span>
               </TableHead>
             </TableRow>
           </TableHeader>
