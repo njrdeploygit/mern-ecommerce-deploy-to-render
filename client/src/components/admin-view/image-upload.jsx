@@ -1,122 +1,119 @@
-import { FileIcon, UploadCloudIcon, XIcon } from "lucide-react";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+// components/admin-view/image-upload.jsx
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useRef } from "react";
-import { Button } from "../ui/button";
-import axios from "axios";
-import { Skeleton } from "../ui/skeleton";
 
 function ProductImageUpload({
   imageFile,
   setImageFile,
-  imageLoadingState,
   uploadedImageUrl,
   setUploadedImageUrl,
   setImageLoadingState,
+  imageLoadingState,
   isEditMode,
-  isCustomStyling = false,      //for image
 }) {
-  const inputRef = useRef(null);
+  const inputRef = useRef();
 
-  console.log(isEditMode, "isEditMode");
+  useEffect(() => {
+    // Auto-preview if imageFile exists
+    if (imageFile) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedImageUrl(reader.result); // preview
+      };
+      reader.readAsDataURL(imageFile);
+    }
+  }, [imageFile, setUploadedImageUrl]);
 
-  function handleImageFileChange(event) {
-    console.log(event.target.files, "event.target.files");
-    const selectedFile = event.target.files?.[0];
-    console.log(selectedFile);
+  function handleFileChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
 
-    if (selectedFile) setImageFile(selectedFile);
+    setImageLoadingState(true);
+    setImageFile(file);
+
+    // Simulate async upload
+const formData = new FormData();
+formData.append("file", file);
+formData.append("upload_preset", "your_unsigned_upload_preset"); // <-- Replace this
+formData.append("cloud_name", "your_cloud_name"); // <-- Optional
+
+fetch("https://api.cloudinary.com/v1_1/your_cloud_name/image/upload", {
+  method: "POST",
+  body: formData,
+})
+  .then((res) => res.json())
+  .then((data) => {
+    if (data.secure_url) {
+      setUploadedImageUrl(data.secure_url);
+    } else {
+      console.error("Cloudinary upload failed", data);
+    }
+    setImageLoadingState(false);
+  })
+  .catch((err) => {
+    console.error("Cloudinary upload error", err);
+    setImageLoadingState(false);
+  });
+
   }
 
-  function handleDragOver(event) {
-    event.preventDefault();
-  }
-
-  function handleDrop(event) {
-    event.preventDefault();
-    const droppedFile = event.dataTransfer.files?.[0];
-    if (droppedFile) setImageFile(droppedFile);
-  }
+  // function handleReplaceImage() {
+  //   if (inputRef.current) inputRef.current.click();
+  // }
 
   function handleRemoveImage() {
     setImageFile(null);
-    if (inputRef.current) {
-      inputRef.current.value = "";
-    }
+    setUploadedImageUrl("");
   }
-
-  //where we are calling api
-  async function uploadImageToCloudinary() {
-    setImageLoadingState(true);
-    const data = new FormData();
-    data.append("my_file", imageFile);
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/api/admin/products/upload-image`,
-      data
-    );
-    console.log(response, "response");
-
-    //where we get the data back
-    if (response?.data?.success) {
-      setUploadedImageUrl(response.data.result.url);
-      setImageLoadingState(false);              //once getting data back we set to false
-    }
-  }
-
-  useEffect(() => {
-    if (imageFile !== null) uploadImageToCloudinary();
-  }, [imageFile]);
 
   return (
-    <div
-      className={`w-full  mt-4 ${isCustomStyling ? "" : "max-w-md mx-auto"}`}
-    >
-      <Label className="text-lg font-semibold mb-2 block">Upload Image</Label>
-      <div
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        className={`${
-          isEditMode ? "opacity-60" : ""
-        } border-2 border-dashed rounded-lg p-4`}
-      >
-        <Input
-          id="image-upload"
-          type="file"
-          className="hidden"
-          ref={inputRef}
-          onChange={handleImageFileChange}
-          disabled={isEditMode}
-        />
-        {!imageFile ? (
-          <Label
-            htmlFor="image-upload"
-            className={`${
-              isEditMode ? "cursor-not-allowed" : ""
-            } flex flex-col items-center justify-center h-32 cursor-pointer`}
-          >
-            <UploadCloudIcon className="w-10 h-10 text-muted-foreground mb-2" />
-            <span>Drag & drop or click to upload image</span>
-          </Label>
-        ) : imageLoadingState ? (
-          <Skeleton className="h-10 bg-gray-100" />
-        ) : (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <FileIcon className="w-8 text-primary mr-2 h-8" />
-            </div>
-            <p className="text-sm font-medium">{imageFile.name}</p>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground hover:text-foreground"
-              onClick={handleRemoveImage}
+    <div className="space-y-3">
+      <Label className="block text-sm font-medium text-muted-foreground">
+        Product Image
+      </Label>
+
+      {imageLoadingState ? (
+        <Skeleton className="w-full h-64 rounded-md" />
+      ) : uploadedImageUrl ? (
+        <div className="relative w-full">
+          <img
+            src={uploadedImageUrl}
+            alt="Preview"
+            className="w-full h-64 object-cover rounded-md border"
+          />
+          <div className="flex gap-2 mt-2">
+            {/* <Button
+              type="button"
+              onClick={handleReplaceImnpm run dev
+              
+              variant="secondary"
+              size="sm"
             >
-              <XIcon className="w-4 h-4" />
-              <span className="sr-only">Remove File</span>
+              Replace
+            </Button> */}
+            <Button
+              type="button"
+              onClick={handleRemoveImage}
+              variant="destructive"
+              size="sm"
+            >
+              Remove
             </Button>
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div>
+          <Input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
+ import MagnifierClearIcon from '@/assets/clearIcon.svg';
 
 function SearchProducts() {
   const [keyword, setKeyword] = useState("");
@@ -87,15 +88,25 @@ function SearchProducts() {
   return (
     <div className="container mx-auto md:px-6 px-4 py-8">
       <div className="flex justify-center mb-8">
-        <div className="w-full flex items-center">
-          <Input
-            value={keyword}
-            name="keyword"
-            onChange={(event) => setKeyword(event.target.value)}
-            className="py-6"
-            placeholder="Search Products..."
-          />
-        </div>
+        <div className="w-full relative flex items-center">
+  <Input
+    value={keyword}
+    name="keyword"
+    onChange={(event) => setKeyword(event.target.value)}
+    className="py-6 pr-10 w-full"
+    placeholder="Search Products..."
+  />
+  
+  {keyword && (
+    <button
+      type="button"
+      onClick={() => setKeyword('')}
+      className="absolute right-3 text-gray-500 hover:text-gray-700"
+    >
+     <img src={MagnifierClearIcon} alt="Clear" className="w-5 h-5" />
+    </button>
+  )}
+</div>
       </div>
       {!searchResults.length ? (
         <h1 className="text-5xl font-extrabold">No result found!</h1>

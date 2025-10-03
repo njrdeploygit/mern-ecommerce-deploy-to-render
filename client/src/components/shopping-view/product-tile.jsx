@@ -1,13 +1,66 @@
 import { Card, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
-import { brandOptionsMap, categoryOptionsMap } from "@/config";
+// import { categoryOptionsMap } from "@/config"; // keep for now
 import { Badge } from "../ui/badge";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useMemo } from "react";
+import { fetchAllBrands } from "@/store/admin/brands-slice";
+import { fetchAllCategories } from "@/store/admin/categories-slice";
+
+function normalizeKey(title) {
+  return (
+    title
+      ?.toLowerCase()
+      .replace(/\s+/g, "")
+      .replace(/[^a-z0-9]/gi, "") || ""
+  );
+}
 
 function ShoppingProductTile({
   product,
   handleGetProductDetails,
   handleAddtoCart,
 }) {
+  const dispatch = useDispatch();
+  const { categoryList } = useSelector((state) => state.adminCategories);
+  const { brandList } = useSelector((state) => state.adminBrands);
+
+  // Fetch categories once
+  useEffect(() => {
+    dispatch(fetchAllCategories());
+  }, [dispatch]);
+
+  // Fetch brands once
+  useEffect(() => {
+    dispatch(fetchAllBrands());
+  }, [dispatch]);
+
+  // Generate categoryOptionsMap dynamically
+  const categoryOptionsMap = useMemo(() => {
+    const map = {};
+    categoryList?.forEach((category) => {
+      const key = normalizeKey(category.title); // e.g. "Men" → "men"
+      map[key] = category.title; // { men: "Men" }
+    });
+    return map;
+  }, [categoryList]);
+
+  // Generate brandOptionsMap dynamically
+  const brandOptionsMap = useMemo(() => {
+    const map = {};
+    brandList?.forEach((brand) => {
+      const key = normalizeKey(brand.title); // e.g. "Nike" → "nike"
+      map[key] = brand.title; // { nike: "Nike" }
+    });
+    return map;
+  }, [brandList]);
+
+  const normalizedCategorydKey = normalizeKey(product?.category);
+  const categoryDisplayName =    categoryOptionsMap[normalizedCategorydKey] || "Unknown";
+
+  const normalizedBrandKey = normalizeKey(product?.brand);
+  const brandDisplayName = brandOptionsMap[normalizedBrandKey] || "Unknown";
+
   return (
     <Card className="w-full max-w-sm mx-auto">
       <div onClick={() => handleGetProductDetails(product?._id)}>
@@ -31,14 +84,15 @@ function ShoppingProductTile({
             </Badge>
           ) : null}
         </div>
+
         <CardContent className="p-4">
           <h2 className="text-xl font-bold mb-2">{product?.title}</h2>
           <div className="flex justify-between items-center mb-2">
             <span className="text-[16px] text-muted-foreground">
-              {categoryOptionsMap[product?.category]}
+              {categoryDisplayName}
             </span>
             <span className="text-[16px] text-muted-foreground">
-              {brandOptionsMap[product?.brand]}
+              {brandDisplayName}
             </span>
           </div>
           <div className="flex justify-between items-center mb-2">

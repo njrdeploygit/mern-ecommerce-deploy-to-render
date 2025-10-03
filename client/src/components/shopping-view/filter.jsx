@@ -1,4 +1,4 @@
-import { filterOptions, filterOptions2 } from "@/config";
+import { filterOptions2 } from "@/config";
 
 import { Fragment, useEffect } from "react";
 import { Label } from "../ui/label";
@@ -11,18 +11,21 @@ import { fetchAllCategories } from "@/store/admin/categories-slice";
 function ProductFilter({ filters, handleFilter }) {
   const dispatch = useDispatch();
   const { categoryList } = useSelector((state) => state.adminCategories);
-  useEffect(() => {
-    dispatch(fetchAllCategories());
-  }, [dispatch]);
-  console.log(categoryList, "categoryList for filteroptions");
-
   const { brandList } = useSelector((state) => state.adminBrands);
+
   useEffect(() => {
-    dispatch(fetchAllBrands());
-  }, [dispatch]);
-  console.log(brandList, "brandList for filteroptions");
+    if (!categoryList?.length) dispatch(fetchAllCategories());
+  }, [dispatch, categoryList]);
+
+  useEffect(() => {
+    if (!brandList?.length) dispatch(fetchAllBrands());
+  }, [dispatch, brandList]);
+
   const dynamicFilters = filterOptions2(categoryList, brandList);
-  console.log(dynamicFilters, "dynamicFilters Logger");
+
+  if (!categoryList.length || !brandList.length) {
+    return <div className="p-4">Loading filters...</div>;
+  }
 
   return (
     <div className="bg-background rounded-lg shadow-sm">
@@ -41,13 +44,9 @@ function ProductFilter({ filters, handleFilter }) {
                     className="flex font-medium items-center gap-2"
                   >
                     <Checkbox
-                      checked={
-                        filters &&
-                        filters[filterGroup.name] &&
-                        filters[filterGroup.name].includes(option.id)
-                      }
-                      onCheckedChange={() =>
-                        handleFilter(filterGroup.name, option.id)
+                      checked={filters?.[filterGroup.name]?.includes(option.id)}
+                      onCheckedChange={(checked) =>
+                        handleFilter(filterGroup.name, option.id, checked)
                       }
                     />
                     {option.label}

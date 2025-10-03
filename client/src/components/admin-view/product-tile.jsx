@@ -7,6 +7,7 @@ function AdminProductTile({
   setOpenCreateProductsDialog,
   setCurrentEditedId,
   handleDelete,
+  setUploadedImageUrl, // <-- receive here
 }) {
   return (
     <Card className="w-full max-w-sm mx-auto">
@@ -39,6 +40,7 @@ function AdminProductTile({
               setOpenCreateProductsDialog(true);
               setCurrentEditedId(product?._id);
               setFormData(product);
+              setUploadedImageUrl(product?.image || ""); // <-- now this works!
             }}
           >
             Edit
@@ -49,5 +51,6 @@ function AdminProductTile({
     </Card>
   );
 }
+
 
 export default AdminProductTile;

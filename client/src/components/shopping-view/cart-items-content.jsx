@@ -1,8 +1,9 @@
-import { Minus, Plus, Trash } from "lucide-react";
+import { Minus, Plus, Trash, LoaderCircle } from "lucide-react";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteCartItem, updateCartQuantity } from "@/store/shop/cart-slice";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 function UserCartItemsContent({ cartItem }) {
   const { user } = useSelector((state) => state.auth);
@@ -11,9 +12,10 @@ function UserCartItemsContent({ cartItem }) {
   const dispatch = useDispatch();
   const { toast } = useToast();
 
+  const [isDeleting, setIsDeleting] = useState(false);
+
   function handleUpdateQuantity(getCartItem, typeOfAction) {
-    //12:37
-    if (typeOfAction == "plus") {
+    if (typeOfAction === "plus") {
       let getCartItems = cartItems.items || [];
 
       if (getCartItems.length) {
@@ -26,8 +28,6 @@ function UserCartItemsContent({ cartItem }) {
         );
         const getTotalStock = productList[getCurrentProductIndex].totalStock;
 
-        console.log(getCurrentProductIndex, getTotalStock, "getTotalStockLOG");
-
         if (indexOfCurrentCartItem > -1) {
           const getQuantity = getCartItems[indexOfCurrentCartItem].quantity;
           if (getQuantity + 1 > getTotalStock) {
@@ -35,7 +35,6 @@ function UserCartItemsContent({ cartItem }) {
               title: `Only ${getQuantity} quantity can be added for this item`,
               variant: "destructive",
             });
-
             return;
           }
         }
@@ -53,32 +52,38 @@ function UserCartItemsContent({ cartItem }) {
       })
     ).then((data) => {
       if (data?.payload?.success) {
-        toast({
-          title: "Cart item is updated successfully",
-        });
+        toast({ title: "Cart item is updated successfully" });
       }
     });
   }
 
-  function handleCartItemDelete(getCartItem) {
-    dispatch(
-      deleteCartItem({ userId: user?.id, productId: getCartItem?.productId })
-    ).then((data) => {
+  async function handleCartItemDelete(getCartItem) {
+    setIsDeleting(true);
+    try {
+      const data = await dispatch(
+        deleteCartItem({ userId: user?.id, productId: getCartItem?.productId })
+      );
+
       if (data?.payload?.success) {
-        toast({
-          title: "Cart item is deleted successfully",
-        });
+        toast({ title: "Cart item is deleted successfully" });
       }
-    });
+    } finally {
+      setIsDeleting(false);
+    }
   }
 
   return (
-    <div className="flex items-center space-x-4">
+    <div
+      className={`flex items-center space-x-4 transition-opacity ${
+        isDeleting ? "opacity-50 pointer-events-none" : ""
+      }`}
+    >
       <img
         src={cartItem?.image}
         alt={cartItem?.title}
         className="w-20 h-20 rounded object-cover"
       />
+
       <div className="flex-1">
         <h3 className="font-extrabold">{cartItem?.title}</h3>
         <div className="flex items-center gap-2 mt-1">
@@ -86,7 +91,7 @@ function UserCartItemsContent({ cartItem }) {
             variant="outline"
             className="h-8 w-8 rounded-full"
             size="icon"
-            disabled={cartItem?.quantity === 1}
+            disabled={cartItem?.quantity === 1 || isDeleting}
             onClick={() => handleUpdateQuantity(cartItem, "minus")}
           >
             <Minus className="w-4 h-4" />
@@ -97,13 +102,15 @@ function UserCartItemsContent({ cartItem }) {
             variant="outline"
             className="h-8 w-8 rounded-full"
             size="icon"
+            disabled={isDeleting}
             onClick={() => handleUpdateQuantity(cartItem, "plus")}
           >
             <Plus className="w-4 h-4" />
-            <span className="sr-only">Decrease</span>
+            <span className="sr-only">Increase</span>
           </Button>
         </div>
       </div>
+
       <div className="flex flex-col items-end">
         <p className="font-semibold">
           $
@@ -112,11 +119,16 @@ function UserCartItemsContent({ cartItem }) {
             cartItem?.quantity
           ).toFixed(2)}
         </p>
-        <Trash
-          onClick={() => handleCartItemDelete(cartItem)}
-          className="cursor-pointer mt-1"
-          size={20}
-        />
+
+        {isDeleting ? (
+          <LoaderCircle className="animate-spin mt-1" size={20} />
+        ) : (
+          <Trash
+            onClick={() => handleCartItemDelete(cartItem)}
+            className="cursor-pointer mt-1"
+            size={20}
+          />
+        )}
       </div>
     </div>
   );

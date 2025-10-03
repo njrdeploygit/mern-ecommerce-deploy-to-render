@@ -36,7 +36,7 @@ const commonFeatureRouter = require("./routes/common/feature-routes");
 
 //>>>used insted of the suspended 1 above
 const db = require("./config/db");
-const brand = require("./models/Brand");
+// const brand = require("./models/Brand");
 
 const app = express();
 

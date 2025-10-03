@@ -21,7 +21,7 @@ const registerUser = async (req, res) => {
       password: hashPassword,
     });
 
-    //create new user inthe database
+    //create new user in the database
     await newUser.save();
     res.status(200).json({
       success: true,
@@ -63,7 +63,7 @@ const loginUser = async (req, res) => {
         id: checkUser._id,
         role: checkUser.role,
         email: checkUser.email,
-        userName: checkUser.userName, 
+        userName: checkUser.userName,
       },
       "CLIENT_SECRET_KEY",
       { expiresIn: "90m" }
@@ -79,6 +79,11 @@ const loginUser = async (req, res) => {
     //     userName: checkUser.userName,
     //   },
     // });
+    
+    // Update loginDateTime
+    checkUser.loginDateTime = new Date();
+    await checkUser.save();
+
     res.status(200).json({
       success: true,
       message: "Logged in successfull",

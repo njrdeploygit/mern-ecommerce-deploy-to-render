@@ -51,68 +51,72 @@ function AdminProducts() {
 
   function onSubmit(event) {
     event.preventDefault();
-    currentEditedId !== null
-      ? dispatch(
-          editProduct({
-            id: currentEditedId,
-            formData,
-          })
-        ).then((data) => {
-          console.log(data, "edit");
 
-          if (data?.payload?.success) {
-            dispatch(fetchAllProducts());
-            setFormData(initialFormData);
-            setOpenCreateProductsDialog(false);
-            setCurrentEditedId(null);
-          }
-        })
-      : dispatch(
-          addNewProduct({
+    if (currentEditedId !== null) {
+      dispatch(
+        editProduct({
+          id: currentEditedId,
+          formData: {
             ...formData,
-            image: uploadedImageUrl,
-          })
-        ).then((data) => {
-          //once product saved we need to get the updaed product
-          console.log(data);
-          if (data?.payload?.success) {
-            dispatch(fetchAllProducts()); //get the list of products
-            setOpenCreateProductsDialog(false); // close the dialog
-            setImageFile(null); // reset the image file
-            setFormData(initialFormData); //reset the form data
-            toast({
-              title: "Product added successfully",
-            });
-          }
-        });
+            image: uploadedImageUrl || formData.image, // <-- use new image if uploaded, else keep old
+          },
+        })
+      ).then((data) => {
+        if (data?.payload?.success) {
+          dispatch(fetchAllProducts());
+          setFormData(initialFormData);
+          setUploadedImageUrl(""); // reset image
+          setImageFile(null);
+          setOpenCreateProductsDialog(false);
+          setCurrentEditedId(null);
+          toast({
+            title: "Product updated successfully",
+          });
+        }
+      });
+    } else {
+      dispatch(
+        addNewProduct({
+          ...formData,
+          image: uploadedImageUrl,
+        })
+      ).then((data) => {
+        if (data?.payload?.success) {
+          dispatch(fetchAllProducts());
+          setOpenCreateProductsDialog(false);
+          setImageFile(null);
+          setFormData(initialFormData);
+          setUploadedImageUrl("");
+          toast({
+            title: "Product added successfully",
+          });
+        }
+      });
+    }
   }
 
-  function handleDelete(getCurrentProductId) {
-    //add here the swal sweet alert dialog
+  function handleDelete(productId, productImageUrl, productTitle) {
     Swal.fire({
-      title: `Are you sure? delete Item : ${getCurrentProductId}`,
-      // text: "You won't be able to revert this!",
-      // icon: "warning",
+      title: "Are you sure?",
+      html: `
+     <p class="text-md text-gray-600">You are about to delete the product:</p>
+        <strong class="block mt-2 text-lg font-semibold text-red-600">${productTitle}</strong>
+      <img src="${productImageUrl}" alt="Product Image" style="max-width: 100%; height: auto; margin-top: 10px; border-radius: 8px;" />
+    `,
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Delete Now!",
     }).then((result) => {
       if (result.isConfirmed) {
-        // console.log(getCurrentProductId);
-        dispatch(deleteProduct(getCurrentProductId)).then((data) => {
+        dispatch(deleteProduct(productId)).then((data) => {
           if (data?.payload?.success) {
-            dispatch(fetchAllProducts()); //get list of the products
+            dispatch(fetchAllProducts());
             toast({
               title: "Product deleted successfully",
             });
           }
         });
-        // Swal.fire({
-        //   title: "Deleted!",
-        //   text: "Product has been deleted.",
-        //   icon: "success",
-        // });
       }
     });
   }
@@ -157,7 +161,14 @@ function AdminProducts() {
                 setOpenCreateProductsDialog={setOpenCreateProductsDialog}
                 setCurrentEditedId={setCurrentEditedId}
                 product={productItem}
-                handleDelete={handleDelete}
+                handleDelete={() =>
+                  handleDelete(
+                    productItem._id,
+                    productItem.image,
+                    productItem.title
+                  )
+                }
+                setUploadedImageUrl={setUploadedImageUrl} // <-- add this line
               />
             ))
           : null}
@@ -168,6 +179,8 @@ function AdminProducts() {
           setOpenCreateProductsDialog(false);
           setCurrentEditedId(null);
           setFormData(initialFormData);
+          setImageFile(null);
+          setUploadedImageUrl("");
         }}
       >
         <SheetContent
@@ -196,7 +209,7 @@ function AdminProducts() {
               formData={formData}
               setFormData={setFormData}
               buttonText={currentEditedId !== null ? "Edit" : "Add"}
-              formControls={addProductFormElements(categoryList,brandList)}
+              formControls={addProductFormElements(categoryList, brandList)}
               isBtnDisabled={!isFormValid()}
             />
           </div>

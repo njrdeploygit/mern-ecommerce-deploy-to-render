@@ -59,7 +59,9 @@ function AuthLogin() {
         setFormData={setFormData}
         onSubmit={onSubmit}
       />
+      <div>forgot password?</div>
     </div>
+    
   );
 }
 
